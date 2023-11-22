@@ -1,0 +1,29 @@
+import requests
+from datetime import datetime as dt
+
+def get_news(language="en", api_key="890603a55bfa47048e4490069ebee18c"):
+
+    topic = input("Enter the topic: ")
+
+    from_date = input("Enter the from date in the yyyy-mm-dd format: ")
+    to_date = input("Enter the to date in the yyyy-mm-dd format: ")
+
+    from_date = dt.strptime(from_date, "%Y-%m-%d")
+    to_date = dt.strptime(to_date, "%Y-%m-%d")
+
+    url = f"https://newsapi.org/v2/everything?qInTitle={topic}&from={from_date}&to={to_date}&sortBy=popularity&language={language}&apiKey={api_key}"
+
+    r = requests.get(url)
+
+    content = r.json()
+    # print(type(content))
+
+    article_list = content["articles"]
+
+    # print(type(content["articles"]))
+
+    for article in article_list:
+        print("Title: ",article["title"].upper(),"\n","Description: ","\n",article["description"])
+
+if __name__ == '__main__':
+    get_news()
