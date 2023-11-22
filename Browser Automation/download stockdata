@@ -1,0 +1,49 @@
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+import time
+import requests
+from datetime import datetime as dt
+
+from_date = input("Enter the Start Date in yyyy/mm/dd format: ")
+to_date = input("Enter the End Date in yyyy/mm/dd format: ")
+from_datetime = dt.strptime(from_date, "%Y/%m/%d")
+to_datetime = dt.strptime(to_date, "%Y/%m/%d")
+from_epoch = int(time.mktime(from_datetime.timetuple()))
+to_epoch = int(time.mktime(to_datetime.timetuple()))
+search_company = input("Enter the symbol of the company: ").upper()
+
+def get_driver():
+    options = webdriver.ChromeOptions()
+    options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    options.add_argument("disable-infobars")
+    options.add_argument("start-maximized")
+    options.add_argument("no-sandbox")
+    options.add_argument("disable-blink-features=AutomationControlled")
+    options.add_argument("disable-dev-shm-usage")
+
+    driver=webdriver.Chrome(options=options)
+    driver.get("https://finance.yahoo.com/")
+    return driver
+def main():
+    driver = get_driver()
+    driver.find_element(by="id", value="yfin-usr-qry").send_keys(f"{search_company}" + Keys.RETURN)
+    time.sleep(5)
+    driver.find_element(by="xpath", value="/html/body/div[1]/div/div/div[1]/div/div[2]/div/div/div[7]/div/div/section/div/ul/li[5]/a/span").click()
+    time.sleep(4)
+    print(driver.current_url)
+
+    headers = {"User-Agent": "Mozilla/5.0 (Linux; Android 11; SAMSUNG SM-G973U) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/14.2 Chrome/87.0.4280.141 Mobile Safari/537.36"}
+
+    down_url = f"https://query1.finance.yahoo.com/v7/finance/download/{search_company}?period1={from_epoch}&period2={to_epoch}&interval=1d&events=history&includeAdjustedClose=true"
+
+    content = requests.get(down_url, headers=headers).content
+    # print(content)
+
+    with open(f"data_of_{search_company}.csv", "wb") as file:
+        file.write(content)
+    print("File Downloading")
+
+    return "File Downloaded"
+    
+if __name__ == '__main__':
+    print(main())
