@@ -1,2 +1,2 @@
 # Automate-With-Python
-UDEMY Course- Automate Everything with Python
+Course- Automate Everything with Python
